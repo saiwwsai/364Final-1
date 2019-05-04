@@ -19,6 +19,16 @@ public class Server {
 
         Scanner kbd = new Scanner(System.in);
 
+        ArrayList<String> quotes = new ArrayList<String>();
+        quotes.add("\"42\"");
+        quotes.add("\"43\"");
+        int randomNum = new Random().nextInt(quotes.size()-1);
+        String ranQuote = quotes.get(randomNum);
+
+
+        BigInteger num1 = getNum();
+        BigInteger num2 = getNum();
+
 
         // todo this is where big integer gets generated
 
@@ -38,32 +48,6 @@ public class Server {
                     true);
 
             while (true) {
-                /*System.out.println("me: ");
-                String s = kbd.nextLine();
-                to.println(s);
-
-                if (s.equals("hihi")){
-                    System.out.println("server says hihi");
-                }
-                String response = from.readLine();   // from client
-                System.out.println(response);
-
-                System.out.println("My response: ");*/
-
-                Random myRandom = new Random();
-                // BigInteger(int numBits, Random rnd)
-                BigInteger tmp1 = new BigInteger(20, myRandom);
-                BigInteger prime1 = tmp1.nextProbablePrime();
-                BigInteger tmp2 = new BigInteger(20, myRandom);
-                BigInteger prime2 = tmp2.nextProbablePrime();
-                BigInteger tmp3 = new BigInteger(10, myRandom);
-                BigInteger prime3 = tmp3.nextProbablePrime();
-                BigInteger tmp4 = new BigInteger(10, myRandom);
-                BigInteger prime4 = tmp4.nextProbablePrime();
-
-                BigInteger num1 = prime1.multiply(prime2);
-                BigInteger num2 = prime3.multiply(prime4);
-
 
                 String response = from.readLine();
 
@@ -83,17 +67,12 @@ public class Server {
 
                     System.out.println("Verifying factors...");
 
-                    // verify the factor == check if they are prime1234
+                    // verify the factor
                     BigInteger fac1num = new BigInteger(fac1);
                     BigInteger fac2num = new BigInteger(fac2);
                     String correct = "\"correct\"";
-                    ArrayList<String> quotes = new ArrayList<String>();
-                    quotes.add("\"42\"");
-                    quotes.add("\"43\"");
-                    int randomNum = new Random().nextInt(quotes.size()-1);
-                    String ranQuote = quotes.get(randomNum);
 
-
+                    // verify the factor by mod it get
                     if (num1.mod(fac1num).equals(BigInteger.ZERO)){
                         if (num2.mod(fac2num).equals(BigInteger.ZERO)){
                             System.out.println("Sending " + correct);
@@ -101,17 +80,11 @@ public class Server {
                             System.out.println("Sending quote " + ranQuote);
                             to.println(ranQuote);
                         }else{
-                            correct = "Check your second factor!";
+                            correct = "incorrect";
                             System.out.println(correct);
                             to.println(correct);
                         }
                     }
-                    else{
-                        correct = "Check your first factor!";
-                        System.out.println(correct);
-                        to.println(correct);
-                    }
-
 
                 }
             }
@@ -119,5 +92,16 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static BigInteger getNum(){
+        Random myRandom = new Random();
+        // BigInteger(int numBits, Random rnd)
+        BigInteger tmp1 = new BigInteger(16, myRandom);
+        BigInteger prime1 = tmp1.nextProbablePrime();
+        BigInteger tmp2 = new BigInteger(31, myRandom);
+        BigInteger prime2 = tmp2.nextProbablePrime();
+
+        return prime1.multiply(prime2);
     }
 }
