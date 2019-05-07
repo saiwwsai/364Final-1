@@ -8,7 +8,7 @@ public class maintest {
     public static void main(String[] args) {
 
         Random myRandom = new Random();
-        // BigInteger(int numBits, Random rnd)
+
         BigInteger tmp1 = new BigInteger(31, myRandom);
         BigInteger prime1 = tmp1.nextProbablePrime();
         BigInteger tmp2 = new BigInteger(31, myRandom);
@@ -22,52 +22,89 @@ public class maintest {
         BigInteger num1 = prime1.multiply(prime2);
         BigInteger num2 = prime3.multiply(prime4);
 
+//        long prime1 = 924937823;
+//        long prime2 = 1125046493;
+//
+//        long num1 = prime1 * prime2;
+
+
 
         System.out.println(prime1);
         System.out.println(prime2);
-   //     System.out.println(prime3);
-    //    System.out.println(prime4);
 
         System.out.println("Num1: " + num1);
-      //  System.out.println(num2);
+        System.out.println("factor: " + factor(num1));
 
-
-
-     //   System.out.println(num1.intValue());
-        System.out.println("SQRT: " + sqrt(num1));
-
-        System.out.println("SQRR: " + sqrt(sqrt(num1)));
-
-        System.out.println("Factor: " + factor(num1));
-
-   //     System.out.println(new BigInteger("624597455879094119").mod(new BigInteger("28151")));  // 0
-        System.out.println("Test Factor is zero? "+num1.mod(factor(num1))); // 0
-
-  //      System.out.println(new BigInteger("77").mod(new BigInteger("7"))); //0
 
     }
 
-    public static BigInteger factor(BigInteger num){
+//    public static BigInteger factor(BigInteger num){
+//
+//      //  BigInteger i = new BigInteger("2");
+//
+//        BigInteger sqr = sqrt(num);
+//        BigInteger sqrr = sqrt(sqr);
+//        BigInteger i = sqrr.nextProbablePrime();
+//
+//        while (i.compareTo(sqr) < 0){
+//            if (num.mod(i).equals(BigInteger.ZERO)){
+//                return i;
+//            }
+//            else{
+//                i = i.nextProbablePrime();
+//            }
+//        }
+//        return null;
+//
+//    }
 
-      //  BigInteger i = new BigInteger("2");
+    public static long factor(BigInteger num){
 
-        BigInteger sqr = sqrt(num);
-        BigInteger sqrr = sqrt(sqr);
-        BigInteger i = sqrr.nextProbablePrime();
+        // BigInteger i = new BigInteger("2");
 
-        while (i.compareTo(sqr) < 0){
-            if (num.mod(i).equals(BigInteger.ZERO)){
-                return i;
+        //   BigInteger sqr = sqrt(num);
+
+        long numLong = num.longValue();
+
+     //   long sqr = sqrt(num).longValue();
+
+        BigInteger i = new BigInteger("2");
+//        long i = 2;
+//
+//
+//        while (i < num){
+//            if (num % i == 0){
+//                return i;
+//            }
+//            else{
+//                BigInteger iBig;
+//                iBig = BigInteger.valueOf(i);
+//                iBig = iBig.nextProbablePrime();
+//                i = iBig.longValue();
+//            }
+//        }
+//        return -1;
+
+        while (i.longValue() < numLong){
+            if (numLong % i.longValue() == 0){
+                return i.longValue();
             }
             else{
                 i = i.nextProbablePrime();
             }
-        //   return i;
         }
-        return null;
+        return -1;
 
+//        while (i.compareTo(num) < 0){
+//            if (num.mod(i).equals(BigInteger.ZERO)){
+//                return i;
+//            }
+//            else{
+//                i = i.nextProbablePrime();
+//            }
+//        }
+//        return null;
     }
-
 
     public static BigInteger sqrt(BigInteger x) {
         BigInteger div = BigInteger.ZERO.setBit(x.bitLength()/2);

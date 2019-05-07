@@ -1,92 +1,122 @@
-import java.io.*;
-import java.net.Socket;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
-
-public class MultithreadedClient implements Runnable{
-
-
-    /** The client connection of Socket. */
-    protected Socket connection;
-
-    /** The request pool. */
-    protected static List pool = new LinkedList();
-
-    /**
-     * Instantiates a new pooled connection handler.
-     */
-    public MultithreadedClient() {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Runnable#run()
-     */
-    public void run() {
-        while (true) {
-            // 因为可能有多个线程同时去Pool中取Socket进行处理。
-            // 所以这里我们需同步，防止同一个请求被多次处理
-            synchronized (pool) {
-                while (pool.isEmpty()) {
-                    try {
-                        pool.wait();// 没有请求到来则等待
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // 从池中取出一个Socket，准备进行处理
-                connection = (Socket) pool.remove(0);
-            }
-            // 取到Socket后则不需要同步了，因为此时是Connection是对象
-            // 级属性，在线程内部自己处理，不涉及公共资源的访问
-            handleConnection();
-        }
-    }
-
-    /**
-     * Process request, append Socket to pool and notify all waitting thread
-     *
-     * @param requestToHandle the request to handle
-     */
-    public static void processRequest(Socket requestToHandle) {
-        // 因为有可能在向池中塞请求的时候，另外一个线程
-        // 正在从池中取Socket，所以这里需要同步一下
-        synchronized (pool) {
-            // 将来自客户端的请求添加到请求队列末尾
-            pool.add(pool.size(), requestToHandle);
-            // 通知其它正在等待的线程有新请求来到，
-            // 此时所有处于wait状态的线程将被唤醒
-            pool.notifyAll();
-        }
-    }
-
-    /**
-     * Handle connection.
-     */
-    public void handleConnection() {
-        try {
-            PrintWriter streamWriter = new PrintWriter(connection
-                    .getOutputStream());
-            BufferedReader streamReader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-
-            String fileToRead = streamReader.readLine();
-            BufferedReader fileReader = new BufferedReader(new FileReader(
-                    fileToRead));
-
-            String line = null;
-            while ((line = fileReader.readLine()) != null)
-                streamWriter.println(line);
-
-            fileReader.close();
-            streamWriter.close();
-            streamReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("");
-        } catch (IOException e) {
-            System.out.println("" + e);
-        }
-    }
-}
+//import java.io.*;
+//import java.math.BigInteger;
+//import java.net.*;
+//import java.util.ArrayList;
+//import java.util.Scanner;
+//
+//public class MultithreadedClient {
+//    public static void main(String[] args) {
+//
+//        Scanner kbd = new Scanner(System.in);
+//        System.out.print("Enter IP address: ");
+//        String ip = kbd.nextLine().trim();
+//
+//
+//        try {
+//            Socket sock = new Socket(ip,36911);
+//            // a send thread to server
+//            SendThread sendThread = new SendThread(sock);
+//
+//            System.out.println("Connected to " +
+//                    sock.getInetAddress());
+//
+//
+//            // press enter to request quote, requesting quote...
+//            System.out.println("Press <Enter> to request a quote:");
+//
+//            // start send thread
+//            Thread thread = new Thread(sendThread);
+//            thread.start();
+//
+//            // start receive thread at the same time
+//            RecieveThread recieveThread = new RecieveThread(sock);
+//            Thread thread2 = new Thread(recieveThread);
+//
+//            thread2.start();
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
+//}
+//class RecieveThread implements Runnable {
+//    Socket sock;
+//    BufferedReader from = null;
+//    PrintWriter to = null;
+//    Scanner kbd = null;
+//
+//    public RecieveThread(Socket sock) {
+//        this.sock = sock;
+//    }//end constructor
+//
+//    public void run() {
+//        try{
+//            kbd = new Scanner(System.in);
+//            from = new BufferedReader(new InputStreamReader(this.sock.getInputStream())); // get local typed message
+//            to = new PrintWriter(sock.getOutputStream(), true);
+//
+//            String s = kbd.nextLine();
+//            to.println(s);
+//            if (s.isEmpty()){
+//                System.out.println("Requesting quote...");
+//            }
+//
+//            // read list of big int from server, fire up same number of threads
+//            String numsFrServer = from.readLine();
+//
+//            String bigNumLst[] = numsFrServer.split(",");
+//
+//            for (String bigNumStr : bigNumLst){
+//
+//                //
+//
+//            }
+//        }catch(Exception e){System.out.println(e.getMessage());}
+//    }//end run
+//}//end class receive thread
+//
+//class SendThread implements Runnable {
+//    Socket sock;
+//    PrintWriter print = null;
+//    BufferedReader brinput = null;
+//    Scanner kbd = new Scanner(System.in);
+//
+//    public SendThread(Socket sock) {
+//        this.sock = sock;
+//    }//end constructor
+//
+//    public void run(){
+//        try{
+//            if(sock.isConnected()) {
+//
+//                brinput = new BufferedReader(new InputStreamReader(System.in));   // message typed
+//                String msgtoServerString;
+//                msgtoServerString = brinput.readLine();             // read the typed message
+//
+//                print.println(s); // print the empty line (after <Enter>)
+//                if (s.isEmpty()){
+//                    System.out.println("Requesting quote...");
+//                }
+//
+//
+//
+//                System.out.println("Client connected to "+sock.getInetAddress() + " on port "+sock.getPort());
+//                this.print = new PrintWriter(sock.getOutputStream(), true);  // sent message
+//
+//                while(true){
+//                    System.out.println("Type your message to send to server..type 'EXIT' to exit");
+//                    brinput = new BufferedReader(new InputStreamReader(System.in));   // message typed
+//                    String msgtoServerString;
+//                    msgtoServerString = brinput.readLine();             // read the typed message
+//                    this.print.println(msgtoServerString);              // send it to the media
+//                    this.print.flush();                                 //
+//
+//                    if(msgtoServerString.equals("EXIT"))
+//                        break;
+//                }//end while
+//                sock.close();
+//            }
+//        }
+//        catch(Exception e){System.out.println(e.getMessage());
+//        }
+//    }//end run method
+//}//end class

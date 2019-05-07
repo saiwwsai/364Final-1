@@ -22,8 +22,8 @@ public class Client {
 
         try {
             sock = new Socket(ip, 36911);
-            System.out.println("Connected to " +
-                    sock.getInetAddress());
+            System.out.println("Connected to " + sock.getInetAddress());
+
             from = new BufferedReader(
                     new InputStreamReader(
                             sock.getInputStream()
@@ -52,8 +52,11 @@ public class Client {
                 System.out.println("Finding factors of " + num1 +", " + num2);
 
                 // find the factor here:
-                BigInteger fac1 = factor(new BigInteger(num1));
-                BigInteger fac2 = factor(new BigInteger(num2));
+//                BigInteger fac1 = factor(new BigInteger(num1));
+//                BigInteger fac2 = factor(new BigInteger(num2));
+
+                long fac1 = factor(new BigInteger(num1));
+                long fac2 = factor(new BigInteger(num2));
 
                 System.out.println("Found factors: " + fac1 + ", " + fac2);
 
@@ -64,8 +67,10 @@ public class Client {
                 // check if we got a "correct"
                 String correct = from.readLine();
                 // receive quote
-                System.out.println("Received " + correct);
+                System.out.println("Received " + correct + "from server");
 
+                String ranQuote = from.readLine();
+                System.out.println("Received quote: " + ranQuote);
 
             }
 
@@ -76,22 +81,36 @@ public class Client {
     }
 
 
-    public static BigInteger factor(BigInteger num){
+    public static long factor(BigInteger num){
 
-        BigInteger i = new BigInteger("2");
+       // BigInteger i = new BigInteger("2");
 
         //   BigInteger sqr = sqrt(num);
 
-        while (i.compareTo(num) < 0){
-            if (num.mod(i).equals(BigInteger.ZERO)){
-                return i;
+        long numLong = num.longValue();
+
+        BigInteger i = new BigInteger("2");
+
+        while (i.longValue() < numLong){
+            if (numLong % i.longValue() == 0){
+                return i.longValue();
             }
             else{
                 i = i.nextProbablePrime();
             }
         }
-        return null;
+        return -1;
 
+//        while (i.compareTo(num) < 0){
+//            if (num.mod(i).equals(BigInteger.ZERO)){
+//                return i;
+//            }
+//            else{
+//                i = i.nextProbablePrime();
+//            }
+//        }
+//        return null;
     }
 
 }
+

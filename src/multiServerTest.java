@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Server {
+public class multiServerTest {
 
     public static void main(String[] args) {
         ServerSocket sock;
@@ -73,30 +73,30 @@ public class Server {
 
 
                     // received factors from client
-                    String fac1 = from.readLine();
-                    String fac2 = from.readLine();
+                    String fac = from.readLine();
 
-                    System.out.println("Received factor:" + fac1 + "," + fac2);
+
+                    System.out.println("Received factor:" + fac);
 
                     System.out.println("Verifying factors...");
 
                     // verify the factor
-                    BigInteger fac1num = new BigInteger(fac1);
-                    BigInteger fac2num = new BigInteger(fac2);
+                    BigInteger fac1num = new BigInteger(fac);
+                    BigInteger fac2num = new BigInteger(fac);
                     String correct = "\"correct\"";
 
                     // verify the factor by mod it get
-                    if (num1.mod(fac1num).equals(BigInteger.ZERO)){
-                        if (num2.mod(fac2num).equals(BigInteger.ZERO)){
-                            System.out.println("Sending " + correct);
-                            to.println(correct);
-                            System.out.println("Sending quote " + ranQuote);
-                            to.println(ranQuote);
-                        }else{
-                            correct = "incorrect";
-                            System.out.println(correct);
-                            to.println(correct);
-                        }
+                    if (num1.mod(fac1num).equals(BigInteger.ZERO)) {
+
+                        System.out.println("Sending " + correct);
+                        to.println(correct);
+                        System.out.println("Sending quote " + ranQuote);
+                        to.println(ranQuote);
+                    }
+                    else{
+                        correct = "incorrect";
+                        System.out.println(correct);
+                        to.println(correct);
                     }
 
                 }
