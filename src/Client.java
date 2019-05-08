@@ -6,8 +6,9 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Scanner;
 
-// square root method: https://stackoverflow.com/questions/4407839/how-can-i-find-the-square-root-of-a-java-biginteger
-
+/**
+ * This class handle single threaded communication
+ */
 public class Client {
 
     public static void main(String[] args) {

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * This class handle single threaded communication
+ */
 public class Server {
 
     public static void main(String[] args) {

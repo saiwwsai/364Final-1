@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * This class handle multiple threads (requests) at the same time
+ */
 
 public class MultiThreadedClient {
-
+    // TODO: is join simultaneously?
 
     public static void main(String[] args) {
 

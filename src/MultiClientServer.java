@@ -10,20 +10,17 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-public class MultiClientServer{
+/**
+ * This class handle multiple clients connect at the same time
+ */
 
-    // todo this class handle multiple clients connect at the same time
+public class MultiClientServer{
 
     public static void main(String[] args) {
         ServerSocket sock;
         Socket client;
-        BufferedReader from;
-        PrintWriter to;
-
-        Scanner kbd = new Scanner(System.in);
 
         System.out.println("(multi-client server) Waiting for connection ...");
-
 
         try {
             sock = new ServerSocket(36911);
@@ -40,8 +37,6 @@ public class MultiClientServer{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
 
     }
 
@@ -81,18 +76,14 @@ public class MultiClientServer{
 
     public static class ServerHelper implements Runnable{
 
-        ServerSocket sock;
         Socket client;
         BufferedReader from;
         PrintWriter to;
-
-        Scanner kbd = new Scanner(System.in);
 
         public ServerHelper (Socket client){
             this.client = client;
 
         }
-
 
         @Override
         public void run() {
@@ -110,7 +101,6 @@ public class MultiClientServer{
 
                 while (true) {
                     // generate a random-sized(0-5) list of big Integers
-                    // random.nextInt(max - min + 1) + min
                     int rand = new Random().nextInt(4)+1;
                     ArrayList<BigInteger> bigNums = new ArrayList<>();
 
@@ -145,7 +135,7 @@ public class MultiClientServer{
                         // verify the factor
                         // transform the "[numbers]" into longs for further computation
                         ArrayList<String> facLst = new ArrayList<>(Arrays.asList(factors.split(",|\\[|\\]")));
-                        long fac = 0;
+                        long fac;
                         boolean result = false;
 
                         for (int i = 0; i < facLst.size(); i ++){
@@ -193,7 +183,4 @@ public class MultiClientServer{
 
         }
     }
-
-
 }
-

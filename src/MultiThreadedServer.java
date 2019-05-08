@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
+/**
+ * This is vclass only handle single client
+ */
 
 public class MultiThreadedServer {
-
-    // todo this class only handle single client
 
     public static void main(String[] args) {
         ServerSocket sock;
@@ -24,21 +24,6 @@ public class MultiThreadedServer {
 
         Scanner kbd = new Scanner(System.in);
 
-        ArrayList<String> quotes = new ArrayList<String>();
-        quotes.add("\"42\"");
-        quotes.add("\"A bird in the hand is safer than one overhead.\"");
-        quotes.add("\"A clean desk is a sign of a sick mind.");
-        quotes.add("\"A computer makes as many mistakes in one second as three people working for thirty years straight.\"");
-        quotes.add("\"A conference is simply an admission that you want somebody else to join you in your troubles.\"");
-        quotes.add("\"A dog is a dog except when he is facing you. Then he is Mr. Dog.\"");
-        quotes.add("\"A great deal of money is never enough once you have it.\"");
-        quotes.add("\"A major failure will not occur until after the unit has passed final inspection.\"");
-        quotes.add("\"A meeting is an event at which the minutes are kept and the hours are lost.\"");
-        quotes.add("\"A misplaced decimal point will always end up where it will do the greatest damage.\"");
-        quotes.add("\"A perfectly calm day will turn gusty the instant you drop a $20 bill.\"");
-        quotes.add("\"A stockbroker is someone who invests your money until it is all gone.\"");
-        quotes.add("\"A synonym is a word you use when you can't spell the other one.\"");
-        quotes.add("\"A waist is a terrible thing to mind.\"");
 
         try {
             sock = new ServerSocket(36911);
@@ -71,8 +56,7 @@ public class MultiThreadedServer {
 
 
                 // generate a random quote
-                int randomNum = new Random().nextInt(quotes.size()-1);
-                String ranQuote = quotes.get(randomNum);
+                String ranQuote = randQuote();
 
                 // start if <Enter> is pressed by client
                 String response = from.readLine();
@@ -140,6 +124,29 @@ public class MultiThreadedServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String randQuote(){
+        ArrayList<String> quotes = new ArrayList<String>();
+        quotes.add("\"42\"");
+        quotes.add("\"A bird in the hand is safer than one overhead.\"");
+        quotes.add("\"A clean desk is a sign of a sick mind.");
+        quotes.add("\"A computer makes as many mistakes in one second as three people working for thirty years straight.\"");
+        quotes.add("\"A conference is simply an admission that you want somebody else to join you in your troubles.\"");
+        quotes.add("\"A dog is a dog except when he is facing you. Then he is Mr. Dog.\"");
+        quotes.add("\"A great deal of money is never enough once you have it.\"");
+        quotes.add("\"A major failure will not occur until after the unit has passed final inspection.\"");
+        quotes.add("\"A meeting is an event at which the minutes are kept and the hours are lost.\"");
+        quotes.add("\"A misplaced decimal point will always end up where it will do the greatest damage.\"");
+        quotes.add("\"A perfectly calm day will turn gusty the instant you drop a $20 bill.\"");
+        quotes.add("\"A stockbroker is someone who invests your money until it is all gone.\"");
+        quotes.add("\"A synonym is a word you use when you can't spell the other one.\"");
+        quotes.add("\"A waist is a terrible thing to mind.\"");
+
+        // generate a random quote
+        int randomNum = new Random().nextInt(quotes.size()-1);
+
+        return quotes.get(randomNum);
     }
 
     public static BigInteger getNum(){
