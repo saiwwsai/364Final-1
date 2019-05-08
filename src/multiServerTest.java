@@ -109,11 +109,8 @@ public class multiServerTest {
 
     public static BigInteger getNum(){
         Random myRandom = new Random();
-        // BigInteger(int numBits, Random rnd)
-        BigInteger tmp1 = new BigInteger(20, myRandom);
-        BigInteger prime1 = tmp1.nextProbablePrime();
-        BigInteger tmp2 = new BigInteger(31, myRandom);
-        BigInteger prime2 = tmp2.nextProbablePrime();
+        BigInteger prime1 = BigInteger.probablePrime(31, myRandom);
+        BigInteger prime2 = BigInteger.probablePrime(31, myRandom);
 
         return prime1.multiply(prime2);
     }
