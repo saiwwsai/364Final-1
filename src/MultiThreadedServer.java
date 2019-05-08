@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -21,19 +22,19 @@ public class MultiThreadedServer {
 
         ArrayList<String> quotes = new ArrayList<String>();
         quotes.add("\"42\"");
-        quotes.add("A bird in the hand is safer than one overhead.");
-        quotes.add("A clean desk is a sign of a sick mind.");
-        quotes.add("A computer makes as many mistakes in one second as three people working for thirty years straight.");
-        quotes.add("A conference is simply an admission that you want somebody else to join you in your troubles.");
-        quotes.add("A dog is a dog except when he is facing you. Then he is Mr. Dog.");
-        quotes.add("A great deal of money is never enough once you have it.");
-        quotes.add("A major failure will not occur until after the unit has passed final inspection.");
-        quotes.add("A meeting is an event at which the minutes are kept and the hours are lost.");
-        quotes.add("A misplaced decimal point will always end up where it will do the greatest damage.");
-        quotes.add("A perfectly calm day will turn gusty the instant you drop a $20 bill.");
-        quotes.add("A stockbroker is someone who invests your money until it is all gone.");
-        quotes.add("A synonym is a word you use when you can't spell the other one.");
-        quotes.add("A waist is a terrible thing to mind.");
+        quotes.add("\"A bird in the hand is safer than one overhead.\"");
+        quotes.add("\"A clean desk is a sign of a sick mind.");
+        quotes.add("\"A computer makes as many mistakes in one second as three people working for thirty years straight.\"");
+        quotes.add("\"A conference is simply an admission that you want somebody else to join you in your troubles.\"");
+        quotes.add("\"A dog is a dog except when he is facing you. Then he is Mr. Dog.\"");
+        quotes.add("\"A great deal of money is never enough once you have it.\"");
+        quotes.add("\"A major failure will not occur until after the unit has passed final inspection.\"");
+        quotes.add("\"A meeting is an event at which the minutes are kept and the hours are lost.\"");
+        quotes.add("\"A misplaced decimal point will always end up where it will do the greatest damage.\"");
+        quotes.add("\"A perfectly calm day will turn gusty the instant you drop a $20 bill.\"");
+        quotes.add("\"A stockbroker is someone who invests your money until it is all gone.\"");
+        quotes.add("\"A synonym is a word you use when you can't spell the other one.\"");
+        quotes.add("\"A waist is a terrible thing to mind.\"");
 
         try {
             sock = new ServerSocket(36911);
@@ -52,51 +53,80 @@ public class MultiThreadedServer {
 
             while (true) {
 
-                BigInteger num1 = getNum();
-                BigInteger num2 = getNum();
 
+                // generate a random-sized(0-5) list of big Integers
+                // random.nextInt(max - min + 1) + min
+                int rand = new Random().nextInt(4)+1;
+                ArrayList<BigInteger> bigNums = new ArrayList<>();
+                // append 0-5 numbers of big integers into the list
+                for (int i = 0; i < rand; i ++){
+                    BigInteger num = getNum();
+                    bigNums.add(num);
+                }
+
+
+                // generate a random quote
                 int randomNum = new Random().nextInt(quotes.size()-1);
                 String ranQuote = quotes.get(randomNum);
 
-
+                // start if <Enter> is pressed by client
                 String response = from.readLine();
-
                 if (response.isEmpty()){
                     System.out.println("Received quote request from client!");
-                    System.out.println("Sending " + num1 + ", " + num2 + " to Client.");
+                    System.out.println("Sending " + bigNums + " to Client.");
 
-                    // pass num1 and num2 to the media
-                    //to.println(num1);
-                    //to.println(num2);
-                    String tmp= num1 + ", " + num2;
-                    to.println(tmp);
+                    // pass bigNums to clients
+                    to.println(bigNums);
 
 
-                    // received factors from client
-                    String fac = from.readLine();
+                    // received factors from client, got a list format
+                    String factors = from.readLine();
 
-
-                    System.out.println("Received factor:" + fac);
+                    // print them in list format
+                    System.out.println("Received factor:" + factors);
 
                     System.out.println("Verifying factors...");
 
                     // verify the factor
-                    BigInteger fac1num = new BigInteger(fac);
-                    BigInteger fac2num = new BigInteger(fac);
-                    String correct = "\"correct\"";
+                    // transform the "[numbers]" into longs for further computation
+                    ArrayList<String> facLst = new ArrayList<>(Arrays.asList(factors.split(",|\\[|\\]")));
+                    long fac = 0;
+                    boolean result = false;
 
-                    // verify the factor by mod it get
-                    if (num1.mod(fac1num).equals(BigInteger.ZERO)) {
+                    for (int i = 0; i < facLst.size(); i ++){
+                        String tmp = facLst.get(i);
+                        if (tmp.equals("")){
+                            facLst.remove(tmp);
+                        }
+                    }
 
-                        System.out.println("Sending " + correct);
-                        to.println(correct);
+                    for (int i = 0; i < facLst.size(); i ++ ){
+                        // this is one factor
+                        String facStr = facLst.get(i).trim();
+                        fac = Long.parseLong(facStr);
+
+                        // this is the corresponding num at the same position
+                        long num = bigNums.get(i).longValue();
+
+                        // verify the factor by mod it get
+                        if (num % fac == 0) {
+                            result = true;
+                        }
+                        else{
+                            result = false;
+                            break;
+                        }
+                    }
+                    String judge = "\"correct\"";
+                    if (result){
+                        System.out.println("Sending " + judge);
+                        to.println(judge);
                         System.out.println("Sending quote " + ranQuote);
                         to.println(ranQuote);
-                    }
-                    else{
-                        correct = "incorrect";
-                        System.out.println(correct);
-                        to.println(correct);
+                    }else{
+                        judge = "\"incorrect\"";
+                        System.out.println(judge);
+                        to.println(judge);
                     }
 
                 }

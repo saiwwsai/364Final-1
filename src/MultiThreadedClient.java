@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -48,14 +49,22 @@ public class MultiThreadedClient {
 
                 // read input bigNumber string
                 String bigNums = from.readLine();
-                String[] bigNumLst = bigNums.split(",");  // list of str() big integers
-
                 System.out.println("Finding factors of " + bigNums);
 
-                // how many bigNums, fire up how many threads
-                for (String bigNumStr : bigNumLst){
+                ArrayList<String> bigNumLst = new ArrayList<>(Arrays.asList(bigNums.split(",|\\[|\\]")));
 
+
+                for (int i = 0; i < bigNumLst.size(); i ++){
+                    String tmp = bigNumLst.get(i);
+                    if (tmp.equals("")){
+                        bigNumLst.remove(tmp);
+                    }
+                }
+                // how many bigNums, fire up how many threads
+                for (int i = 0; i < bigNumLst.size(); i ++){
+                    String bigNumStr = bigNumLst.get(i);
                     bigNumStr = bigNumStr.trim(); // "9898365794735959"
+                   // System.out.println("here: " + bigNumStr);
 
                     // start send thread with help from helper thread
                     // pass in the string with Big Nums for the runnable to compute factor
@@ -90,7 +99,12 @@ public class MultiThreadedClient {
                 result = from.readLine();
 
                 // receive quote
-                System.out.println("Received " + result);
+                System.out.println("Received " + result + " from Server!");
+
+                String quote = from.readLine();
+                // receive quote
+                System.out.println("Received " + quote);
+
 
             }
 
@@ -153,16 +167,21 @@ public class MultiThreadedClient {
         long i = 2;
         long sqr = (long) Math.sqrt(num);
 
-        // % 2 first, then % all the odds after 2
-        while (i < sqr) {
-            if (num % i == 0){
-                return i;
-            }
-            else{
-                i = i + 2;
+        if (num % 2 == 0){
+            return 2;
+        }
+        else {
+            i = 3;
+            while (i < sqr) {
+                if (num % i == 0) {
+                    return i;
+                } else {
+                    i = i + 2;
+                }
             }
         }
         return i;
+
     }
 
 }
