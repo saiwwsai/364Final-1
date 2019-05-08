@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
-
 public class MultiClientServer{
 
     // todo this class handle multiple clients connect at the same time
@@ -30,13 +28,14 @@ public class MultiClientServer{
         try {
             sock = new ServerSocket(36911);
 
-            client = sock.accept();
+            while (true){
+                client = sock.accept();
+                MultiClientServer.ServerHelper helpThread = new MultiClientServer.ServerHelper(client);
+                // start a new thread for each string(big nums)
+                Thread newThread = new Thread(helpThread);
+                newThread.start();
 
-
-            MultiClientServer.ServerHelper helpThread = new MultiClientServer.ServerHelper(client);
-            // start a new thread for each string(big nums)
-            Thread newThread = new Thread(helpThread);
-            newThread.start();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,8 +94,6 @@ public class MultiClientServer{
         }
 
 
-
-
         @Override
         public void run() {
             try {
@@ -125,8 +122,6 @@ public class MultiClientServer{
                         BigInteger num = getNum();
                         bigNums.add(num);
                     }
-
-
 
 
                     // start if <Enter> is pressed by client
