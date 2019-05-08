@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 public class MultiThreadedClient {
 
-    // todo testing
 
     public static void main(String[] args) {
 
@@ -103,7 +102,9 @@ public class MultiThreadedClient {
 
                 String quote = from.readLine();
                 // receive quote
-                System.out.println("Received " + quote);
+                System.out.println("Received " + quote + " from Server.");
+                // not make it running previous value
+                facLst.clear();
 
 
             }

@@ -10,9 +10,11 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
+import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
+
 public class MultiThreadedServer {
 
-    // todo handle multiple clients
+    // todo this class only handle single client
 
     public static void main(String[] args) {
         ServerSocket sock;
@@ -41,6 +43,8 @@ public class MultiThreadedServer {
         try {
             sock = new ServerSocket(36911);
             System.out.println("Waiting for connection ...");
+
+
             client = sock.accept();
             System.out.println("Connected to " +
                     client.getInetAddress());
@@ -54,12 +58,11 @@ public class MultiThreadedServer {
                     true);
 
             while (true) {
-
-
                 // generate a random-sized(0-5) list of big Integers
                 // random.nextInt(max - min + 1) + min
                 int rand = new Random().nextInt(4)+1;
                 ArrayList<BigInteger> bigNums = new ArrayList<>();
+
                 // append 0-5 numbers of big integers into the list
                 for (int i = 0; i < rand; i ++){
                     BigInteger num = getNum();
@@ -121,13 +124,13 @@ public class MultiThreadedServer {
                     }
                     String judge = "\"correct\"";
                     if (result){
-                        System.out.println("Sending " + judge);
+                        System.out.println("Sending " + judge + " to Client.");
                         to.println(judge);
                         System.out.println("Sending quote " + ranQuote);
                         to.println(ranQuote);
                     }else{
                         judge = "\"incorrect\"";
-                        System.out.println(judge);
+                        System.out.println(judge + " to Client.");
                         to.println(judge);
                     }
 
@@ -141,9 +144,12 @@ public class MultiThreadedServer {
 
     public static BigInteger getNum(){
         Random myRandom = new Random();
-        BigInteger prime1 = BigInteger.probablePrime(31, myRandom);
-        BigInteger prime2 = BigInteger.probablePrime(31, myRandom);
+        int bigRand = new Random().nextInt(17) + 15;
+        BigInteger prime1 = BigInteger.probablePrime(bigRand, myRandom);
+        BigInteger prime2 = BigInteger.probablePrime(bigRand, myRandom);
 
         return prime1.multiply(prime2);
     }
+
 }
+
