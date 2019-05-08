@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class MultiThreadedClient {
 
-    // todo NOTE: cannot run a second round yet because multi server is not complete yet
+    // todo testing
 
     public static void main(String[] args) {
 

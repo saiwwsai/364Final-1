@@ -12,6 +12,8 @@ import java.util.Scanner;
 
 public class MultiThreadedServer {
 
+    // todo handle multiple clients
+
     public static void main(String[] args) {
         ServerSocket sock;
         Socket client;
