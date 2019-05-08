@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class multiServerTest {
+public class MultiThreadedServer {
 
     public static void main(String[] args) {
         ServerSocket sock;
