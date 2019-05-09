@@ -100,7 +100,7 @@ public class MultiClientServer{
 
                 while (true) {
                     // generate a random-sized(0-5) list of big Integers
-                    int rand = new Random().nextInt(4)+1;
+                    int rand = new Random().nextInt(4) + 1;
                     ArrayList<BigInteger> bigNums = new ArrayList<>();
 
                     // get random quote

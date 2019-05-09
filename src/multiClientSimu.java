@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
  */
 
 public class multiClientSimu {
-    // TODO: is join simultaneously?
 
     public static void main(String[] args) {
 
@@ -28,6 +27,9 @@ public class multiClientSimu {
 
         // instant factor list
         ArrayList<Long> facLst = new ArrayList<>();
+
+        HelperThread helpThread = null;
+        Thread newThread = null;
 
         try {
             sock = new Socket(ip, 36911);
@@ -43,7 +45,6 @@ public class multiClientSimu {
 
             // start the conversation
             while (true) {
-
                 System.out.println("Press <Enter> to request a quote:");
                 // client's response
                 String s = kbd.nextLine();
@@ -69,18 +70,14 @@ public class multiClientSimu {
                 // how many bigNums, fire up how many threads
                 for (int i = 0; i < bigNumLst.size(); i ++){
                     String bigNumStr = bigNumLst.get(i);
-                    bigNumStr = bigNumStr.trim(); // "9898365794735959"
-                    // System.out.println("here: " + bigNumStr);
-
-                    // start send thread with help from helper thread
-                    // pass in the string with Big Nums for the runnable to compute factor
-                    HelperThread helpThread = new HelperThread(sock, bigNumStr);
+                    bigNumStr = bigNumStr.trim();
+                    helpThread = new HelperThread(sock, bigNumStr);
                     // start a new thread for each string(big nums)
-                    Thread newThread = new Thread(helpThread);
+                    newThread = new Thread(helpThread);
                     newThread.start();
-
-                   // threads.add(newThread);
                 }
+
+                newThread.join();
 
 
                 // check if we got a "correct"
@@ -90,16 +87,21 @@ public class multiClientSimu {
                 // receive quote
                 System.out.println("Received " + result + " from Server!");
 
-                String quote = from.readLine();
-                // receive quote
-                System.out.println("Received " + quote + " from Server.");
-                // not make it running previous value
-                // facLst.clear();
-
+                if (result.equals( "\"correct\"")){
+                    String quote = from.readLine();
+                    // receive quote
+                    System.out.println("Received " + quote + " from Server.");
+                }
+                else{
+                    // todo show up the enter thing again
+                    System.out.println("DO IT A AGIN");
+                }
 
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -116,10 +118,6 @@ public class multiClientSimu {
         Scanner kbd = null;
 
         String numStr;
-        private long fac = 0;
-        //   ArrayList<BigInteger> facs = new ArrayList<>();
-        ArrayList<Long> facLst = new ArrayList<>();
-
         // constructors: initialization
         public HelperThread(Socket sock, String numStr) {
             this.sock = sock;
@@ -140,28 +138,20 @@ public class multiClientSimu {
 
         }
 
-        // pass the fac to main
-        public long getFac(){
-            return fac;
-        }
-
-
         @Override
         public void run() {  // no need to synchronize because we have join()
             // compute the factor
             long numLong = Long.parseLong(numStr);
-//            this.fac = factor(numLong);
+            System.out.println(newThread.getName() + " is runnning.");
 
             long factor = factor(numLong);
+
 
             // display the factor in list format
             System.out.println(newThread.getName() + " found factor: " + factor);
 
-        //    this.facLst.add(factor);
-
             // send to server
             to.println(factor);
-
         }
     }
 

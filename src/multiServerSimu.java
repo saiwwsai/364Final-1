@@ -8,16 +8,16 @@ import java.util.Random;
 
 
 public class multiServerSimu implements Runnable {
-    Socket clientsocket;
+    Socket client;
     String quote = randQuote();
     ArrayList<BigInteger> bigNums = new ArrayList<>();
 
-    multiServerSimu(Socket clientsocket) {
-        this.clientsocket = clientsocket;
+    multiServerSimu(Socket client) {
+        this.client = client;
     }
     public static void main(String args[]) throws Exception {
         ServerSocket sock = new ServerSocket(36911);
-        System.out.println("\"(multi clients server) Waiting for connection ...\"Waiting for connection ...");
+        System.out.println("(multi clients server) Waiting for connection ...");
 
         while (true) {
             Socket client = sock.accept();
@@ -32,30 +32,33 @@ public class multiServerSimu implements Runnable {
         synchronized (this){
             try{
                 System.out.println("Connected to " +
-                        clientsocket.getInetAddress());
+                        client.getInetAddress());
                 BufferedReader from = new BufferedReader(
                         new InputStreamReader(
-                                clientsocket.getInputStream()
+                                client.getInputStream()
                         )
                 );
 
-                PrintWriter to = new PrintWriter(clientsocket.getOutputStream(),
+                PrintWriter to = new PrintWriter(client.getOutputStream(),
                         true);
+
+
+
+
 
                 while(true){
                     String response = from.readLine();
-                    if (!response.equals(null)){
-                        System.out.println("Received quote request from client ");
+                    if (response.isEmpty()){
+                        System.out.println("Received quote request from Client " + client.getInetAddress() + ".");
 
                         int rand = new Random().nextInt(4)+1;
-                    //    ArrayList<BigInteger> bigNums = new ArrayList<>();
 
                         // append 0-5 numbers of big integers into the list
                         for (int i = 0; i < rand; i ++){
                             BigInteger num = getNum();
                             bigNums.add(num);
                         }
-                        System.out.println("Sending " + bigNums + " to Client.");
+                        System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
 
                         // pass bigNums to clients
                         to.println(bigNums);
@@ -66,24 +69,33 @@ public class multiServerSimu implements Runnable {
 
                             boolean result = true;
 
-                            for (int i = 0; i < rand; i++){
+                            for (int i = 0; i < bigNums.size(); i++){
                                 String fac = from.readLine();
 
-                                System.out.println("Verifying received factor " + fac + " for number " + bigNums.get(i));
+                                System.out.println("Verifying received factor-" + fac + " for number-" + bigNums.get(i)
+                                + " for Client " + client.getInetAddress() + ".");
 
                                 long factor = Long.parseLong(fac);
                                 if (bigNums.get(i).longValue() % factor == 0){
-                                    System.out.println("Correct!");
+                                    result = true;
                                 }
                                 else{
-                                    System.out.println("Incorrect");
                                     result = false;
                                 }
                             }
+
+                            String judge = "\"correct\"";
                             if (result){
-                                to.println(this.quote);
-                                break;
+                                System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
+                                to.println(judge);
+                                System.out.println("Sending quote " + quote + " to Client " + client.getInetAddress() + "...");
+                                to.println(quote);
+                            }else{
+                                judge = "\"incorrect\"";
+                                System.out.println(judge + " to Client " + client.getInetAddress() + ".");
+                                to.println(judge);
                             }
+
                         }
 
                     }
