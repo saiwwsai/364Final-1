@@ -1,78 +1,101 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
-/**
- * This class handle multiple clients connect at the same time
- */
 
-public class multiServerSimu{
+public class multiServerSimu implements Runnable {
+    Socket clientsocket;
+    String quote = randQuote();
+    ArrayList<BigInteger> bigNums = new ArrayList<>();
 
-    public static void main(String[] args) {
-        ServerSocket sock;
-        Socket client;
-        PrintWriter to;
+    multiServerSimu(Socket clientsocket) {
+        this.clientsocket = clientsocket;
+    }
+    public static void main(String args[]) throws Exception {
+        ServerSocket sock = new ServerSocket(36911);
+        System.out.println("\"(multi clients server) Waiting for connection ...\"Waiting for connection ...");
 
-        System.out.println("(multi-client server) Waiting for connection ...");
+        while (true) {
+            Socket client = sock.accept();
+            new Thread(new multiServerSimu(client)).start();
+        }
+    }
 
-        try {
-            sock = new ServerSocket(36911);
 
-            while (true){
-                client = sock.accept();
-                to = new PrintWriter(client.getOutputStream(),
+
+    @Override
+    public void run() {
+        synchronized (this){
+            try{
+                System.out.println("Connected to " +
+                        clientsocket.getInetAddress());
+                BufferedReader from = new BufferedReader(
+                        new InputStreamReader(
+                                clientsocket.getInputStream()
+                        )
+                );
+
+                PrintWriter to = new PrintWriter(clientsocket.getOutputStream(),
                         true);
-                multiServerSimu.ServerHelper helpThread = new multiServerSimu.ServerHelper(client);
-                // start a new thread for each string(big nums)
-                Thread newThread = new Thread(helpThread);
-                newThread.start();
 
-                System.out.println("Verifying factors for Client " + client.getInetAddress() + "...");
+                while(true){
+                    String response = from.readLine();
+                    if (!response.equals(null)){
+                        System.out.println("Received quote request from client ");
 
-                newThread.join();
+                        int rand = new Random().nextInt(4)+1;
+                    //    ArrayList<BigInteger> bigNums = new ArrayList<>();
 
-                // get random quote
-                String ranQuote = randQuote();
+                        // append 0-5 numbers of big integers into the list
+                        for (int i = 0; i < rand; i ++){
+                            BigInteger num = getNum();
+                            bigNums.add(num);
+                        }
+                        System.out.println("Sending " + bigNums + " to Client.");
 
-                String judge = "\"correct\"";
-                if (helpThread.result){
-                    System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
-                    to.println(judge);
-                    System.out.println("Sending quote " + ranQuote + " to Client " + client.getInetAddress() + "...");
-                    to.println(ranQuote);
-                }else{
-                    judge = "\"incorrect\"";
-                    System.out.println(judge + " to Client " + client.getInetAddress() + ".");
-                    to.println(judge);
+                        // pass bigNums to clients
+                        to.println(bigNums);
+
+
+
+                        while(true){
+
+                            boolean result = true;
+
+                            for (int i = 0; i < rand; i++){
+                                String fac = from.readLine();
+
+                                System.out.println("Verifying received factor " + fac + " for number " + bigNums.get(i));
+
+                                long factor = Long.parseLong(fac);
+                                if (bigNums.get(i).longValue() % factor == 0){
+                                    System.out.println("Correct!");
+                                }
+                                else{
+                                    System.out.println("Incorrect");
+                                    result = false;
+                                }
+                            }
+                            if (result){
+                                to.println(this.quote);
+                                break;
+                            }
+                        }
+
+                    }
                 }
             }
+            catch (IOException e){
+                e.printStackTrace();
+            }
 
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
     }
-
-    public static BigInteger getNum(){
-        Random myRandom = new Random();
-        int bigRand = new Random().nextInt(17) + 15;
-        BigInteger prime1 = BigInteger.probablePrime(bigRand, myRandom);
-        BigInteger prime2 = BigInteger.probablePrime(bigRand, myRandom);
-
-        return prime1.multiply(prime2);
-    }
-
 
     public static String randQuote(){
         ArrayList<String> quotes = new ArrayList<String>();
@@ -97,91 +120,12 @@ public class multiServerSimu{
         return quotes.get(randomNum);
     }
 
+    public static BigInteger getNum(){
+        Random myRandom = new Random();
+        int bigRand = new Random().nextInt(17) + 15;
+        BigInteger prime1 = BigInteger.probablePrime(bigRand, myRandom);
+        BigInteger prime2 = BigInteger.probablePrime(bigRand, myRandom);
 
-    public static class ServerHelper implements Runnable{
-
-        Socket client;
-        BufferedReader from;
-        PrintWriter to;
-
-        Boolean result;
-
-        public ServerHelper (Socket client){
-            this.client = client;
-            this.result = false;
-        }
-
-        public boolean getResult(){
-            return result;
-        }
-
-        @Override
-        public void run() {
-            try {
-                System.out.println("Connected to " +
-                        client.getInetAddress());
-                from = new BufferedReader(
-                        new InputStreamReader(
-                                client.getInputStream()
-                        )
-                );
-
-                to = new PrintWriter(client.getOutputStream(),
-                        true);
-
-                while (true) {
-                    // generate a random-sized(0-5) list of big Integers
-                    int rand = new Random().nextInt(4)+1;
-                    ArrayList<BigInteger> bigNums = new ArrayList<>();
-
-                    // get random quote
-                    String ranQuote = randQuote();
-
-                    // append 0-5 numbers of big integers into the list
-                    for (int i = 0; i < rand; i ++){
-                        BigInteger num = getNum();
-                        bigNums.add(num);
-                    }
-
-
-                    // start if <Enter> is pressed by client
-                    String response = from.readLine();
-                    if (response.isEmpty()){
-                        System.out.println("Received quote request from Client " + client.getInetAddress() + "!");
-                        System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
-
-                        // pass bigNums to clients
-                        to.println(bigNums);
-
-                        // received a factor from client, got a list format
-                        String factor = from.readLine();
-
-                        // print them in list format
-                        System.out.println("Received factor:" + factor + " from Client " + client.getInetAddress());
-
-                        factor = factor.substring(1, factor.length()-1);
-                        long fac = Long.parseLong(factor);
-                      //  boolean result = false;
-
-                        for (int i = 0; i < bigNums.size(); i ++ ) {
-                            // this is the corresponding num at the same position
-                            long num = bigNums.get(i).longValue();
-
-                            // verify the factor by mod it get
-                            if (num % fac == 0) {
-                                this.result = true;
-                            } else {
-                                this.result = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        return prime1.multiply(prime2);
     }
 }

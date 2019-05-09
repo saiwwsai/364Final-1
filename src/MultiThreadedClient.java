@@ -74,12 +74,14 @@ public class MultiThreadedClient {
                     // start a new thread for each string(big nums)
                     Thread newThread = new Thread(helpThread);
                     newThread.start();
+                    System.out.println(newThread.getName());
 
-                    long delay = bigNumLst.size() * 2000;
+              //      long delay = bigNumLst.size() * 2000;
 
                     // finish the thread then save the factor
                     try {
-                        newThread.sleep(delay);  // wait for newThread to finish
+              //          Thread.sleep(delay);  // wait for newThread to finish
+                        newThread.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         return;

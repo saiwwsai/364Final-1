@@ -25,6 +25,7 @@ public class multiClientSimu {
 
         System.out.print("Enter IP address: ");
         String ip = kbd.nextLine().trim();
+
         // instant factor list
         ArrayList<Long> facLst = new ArrayList<>();
 
@@ -65,8 +66,6 @@ public class multiClientSimu {
                     }
                 }
 
-                ArrayList<Thread> threads = new ArrayList<>();
-
                 // how many bigNums, fire up how many threads
                 for (int i = 0; i < bigNumLst.size(); i ++){
                     String bigNumStr = bigNumLst.get(i);
@@ -80,18 +79,9 @@ public class multiClientSimu {
                     Thread newThread = new Thread(helpThread);
                     newThread.start();
 
-                    threads.add(newThread);
+                   // threads.add(newThread);
                 }
 
-                // wait until all threads to finish
-                for (Thread thred : threads){
-                    try {
-                        thred.join();  // wait for newThread to finish
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                }
 
                 // check if we got a "correct"
                 String result;
@@ -117,6 +107,8 @@ public class multiClientSimu {
 
     // a class for runnable, put all the computation under override run
     public static class HelperThread implements Runnable{
+
+        Thread newThread = new Thread();
 
         Socket sock = null;
         BufferedReader from = null;
@@ -163,12 +155,12 @@ public class multiClientSimu {
             long factor = factor(numLong);
 
             // display the factor in list format
-            System.out.println("Found factor: " + factor);
+            System.out.println(newThread.getName() + " found factor: " + factor);
 
-            this.facLst.add(factor);
+        //    this.facLst.add(factor);
 
             // send to server
-            to.println(facLst);
+            to.println(factor);
 
         }
     }
