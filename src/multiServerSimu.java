@@ -26,7 +26,6 @@ public class multiServerSimu implements Runnable {
     }
 
 
-
     @Override
     public void run() {
         synchronized (this){
@@ -43,12 +42,10 @@ public class multiServerSimu implements Runnable {
                         true);
 
 
-
-
-
                 while(true){
                     String response = from.readLine();
                     if (response.isEmpty()){
+
                         System.out.println("Received quote request from Client " + client.getInetAddress() + ".");
 
                         int rand = new Random().nextInt(4)+1;
@@ -58,23 +55,25 @@ public class multiServerSimu implements Runnable {
                             BigInteger num = getNum();
                             bigNums.add(num);
                         }
-                        System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
-
                         // pass bigNums to clients
                         to.println(bigNums);
+                        System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
 
 
 
-                        while(true){
+                      //  while(true){
+                        boolean result = true;
 
-                            boolean result = true;
+                        for (int i = 0; i < bigNums.size(); i++){
+                            String fac = from.readLine();
 
-                            for (int i = 0; i < bigNums.size(); i++){
-                                String fac = from.readLine();
+                            String threNum = from.readLine();
 
+                            int threadNum = Integer.parseInt(threNum);
+
+                            if (threadNum == i){
                                 System.out.println("Verifying received factor-" + fac + " for number-" + bigNums.get(i)
-                                + " for Client " + client.getInetAddress() + ".");
-
+                                        + " for Client " + client.getInetAddress() + ".");
                                 long factor = Long.parseLong(fac);
                                 if (bigNums.get(i).longValue() % factor == 0){
                                     result = true;
@@ -84,22 +83,26 @@ public class multiServerSimu implements Runnable {
                                 }
                             }
 
-                            String judge = "\"correct\"";
-                            if (result){
-                                System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
-                                to.println(judge);
-                                System.out.println("Sending quote " + quote + " to Client " + client.getInetAddress() + "...");
-                                to.println(quote);
-                            }else{
-                                judge = "\"incorrect\"";
-                                System.out.println(judge + " to Client " + client.getInetAddress() + ".");
-                                to.println(judge);
-                            }
+                        }
+
+                        String judge = "\"correct\"";
+                        if (result){
+                            System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
+                            to.println(judge);
+                            System.out.println("Sending quote " + quote + " to Client " + client.getInetAddress() + "...");
+                            to.println(quote);
+                        }else{
+                            judge = "\"incorrect\"";
+                            System.out.println(judge + " to Client " + client.getInetAddress() + ".");
+                            to.println(judge);
+                        }
 
                         }
 
                     }
-                }
+
+               // }
+
             }
             catch (IOException e){
                 e.printStackTrace();

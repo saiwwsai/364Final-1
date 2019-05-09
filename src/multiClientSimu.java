@@ -25,8 +25,6 @@ public class multiClientSimu {
         System.out.print("Enter IP address: ");
         String ip = kbd.nextLine().trim();
 
-        // instant factor list
-        ArrayList<Long> facLst = new ArrayList<>();
 
         HelperThread helpThread = null;
         Thread newThread = null;
@@ -48,7 +46,7 @@ public class multiClientSimu {
                 System.out.println("Press <Enter> to request a quote:");
                 // client's response
                 String s = kbd.nextLine();
-                to.println(s);
+                to.println(s); //empty
                 if (s.isEmpty()){
                     System.out.println("Requesting quote...");
                 }
@@ -96,7 +94,7 @@ public class multiClientSimu {
                     // todo show up the enter thing again
                     System.out.println("DO IT A AGIN");
                 }
-
+                to.flush();
             }
 
         } catch (IOException e) {
@@ -142,16 +140,20 @@ public class multiClientSimu {
         public void run() {  // no need to synchronize because we have join()
             // compute the factor
             long numLong = Long.parseLong(numStr);
-            System.out.println(newThread.getName() + " is runnning.");
+            int threadNum = 0;
+
+
+            System.out.println(newThread.getName() + " is running.");
 
             long factor = factor(numLong);
 
 
             // display the factor in list format
             System.out.println(newThread.getName() + " found factor: " + factor);
-
+            threadNum = Integer.parseInt(newThread.getName().substring(6));
             // send to server
             to.println(factor);
+            to.println(threadNum);
         }
     }
 
