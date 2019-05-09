@@ -13,11 +13,12 @@ import java.util.Random;
  * This class handle multiple clients connect at the same time
  */
 
-public class MultiClientServer{
+public class multiServerSimu{
 
     public static void main(String[] args) {
         ServerSocket sock;
         Socket client;
+        PrintWriter to;
 
         System.out.println("(multi-client server) Waiting for connection ...");
 
@@ -26,14 +27,38 @@ public class MultiClientServer{
 
             while (true){
                 client = sock.accept();
-                MultiClientServer.ServerHelper helpThread = new MultiClientServer.ServerHelper(client);
+                to = new PrintWriter(client.getOutputStream(),
+                        true);
+                multiServerSimu.ServerHelper helpThread = new multiServerSimu.ServerHelper(client);
                 // start a new thread for each string(big nums)
                 Thread newThread = new Thread(helpThread);
                 newThread.start();
 
+                System.out.println("Verifying factors for Client " + client.getInetAddress() + "...");
+
+                newThread.join();
+
+                // get random quote
+                String ranQuote = randQuote();
+
+                String judge = "\"correct\"";
+                if (helpThread.result){
+                    System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
+                    to.println(judge);
+                    System.out.println("Sending quote " + ranQuote + " to Client " + client.getInetAddress() + "...");
+                    to.println(ranQuote);
+                }else{
+                    judge = "\"incorrect\"";
+                    System.out.println(judge + " to Client " + client.getInetAddress() + ".");
+                    to.println(judge);
+                }
             }
 
+
+
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -53,7 +78,7 @@ public class MultiClientServer{
         ArrayList<String> quotes = new ArrayList<String>();
         quotes.add("\"42\"");
         quotes.add("\"A bird in the hand is safer than one overhead.\"");
-        quotes.add("\"A clean desk is a sign of a sick mind.");
+        quotes.add("\"A clean desk is a sign of a sick mind.\"");
         quotes.add("\"A computer makes as many mistakes in one second as three people working for thirty years straight.\"");
         quotes.add("\"A conference is simply an admission that you want somebody else to join you in your troubles.\"");
         quotes.add("\"A dog is a dog except when he is facing you. Then he is Mr. Dog.\"");
@@ -79,9 +104,15 @@ public class MultiClientServer{
         BufferedReader from;
         PrintWriter to;
 
+        Boolean result;
+
         public ServerHelper (Socket client){
             this.client = client;
+            this.result = false;
+        }
 
+        public boolean getResult(){
+            return result;
         }
 
         @Override
@@ -122,57 +153,28 @@ public class MultiClientServer{
                         // pass bigNums to clients
                         to.println(bigNums);
 
-
-                        // received factors from client, got a list format
-                        String factors = from.readLine();
+                        // received a factor from client, got a list format
+                        String factor = from.readLine();
 
                         // print them in list format
-                        System.out.println("Received factor:" + factors + "from Client " + client.getInetAddress());
+                        System.out.println("Received factor:" + factor + " from Client " + client.getInetAddress());
 
-                        System.out.println("Verifying factors for Client " + client.getInetAddress() + "...");
+                        factor = factor.substring(1, factor.length()-1);
+                        long fac = Long.parseLong(factor);
+                      //  boolean result = false;
 
-                        // verify the factor
-                        // transform the "[numbers]" into longs for further computation
-                        ArrayList<String> facLst = new ArrayList<>(Arrays.asList(factors.split(",|\\[|\\]")));
-                        long fac;
-                        boolean result = false;
-
-                        for (int i = 0; i < facLst.size(); i ++){
-                            String tmp = facLst.get(i);
-                            if (tmp.equals("")){
-                                facLst.remove(tmp);
-                            }
-                        }
-
-                        for (int i = 0; i < facLst.size(); i ++ ){
-                            // this is one factor
-                            String facStr = facLst.get(i).trim();
-                            fac = Long.parseLong(facStr);
-
+                        for (int i = 0; i < bigNums.size(); i ++ ) {
                             // this is the corresponding num at the same position
                             long num = bigNums.get(i).longValue();
 
                             // verify the factor by mod it get
                             if (num % fac == 0) {
-                                result = true;
-                            }
-                            else{
-                                result = false;
+                                this.result = true;
+                            } else {
+                                this.result = false;
                                 break;
                             }
                         }
-                        String judge = "\"correct\"";
-                        if (result){
-                            System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
-                            to.println(judge);
-                            System.out.println("Sending quote " + ranQuote + " to Client " + client.getInetAddress() + "...");
-                            to.println(ranQuote);
-                        }else{
-                            judge = "\"incorrect\"";
-                            System.out.println(judge + " to Client " + client.getInetAddress() + ".");
-                            to.println(judge);
-                        }
-
                     }
                 }
 

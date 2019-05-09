@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * This is vclass only handle single client
+ * This is class only handle single client
  */
 
 public class MultiThreadedServer {
@@ -130,7 +130,7 @@ public class MultiThreadedServer {
         ArrayList<String> quotes = new ArrayList<String>();
         quotes.add("\"42\"");
         quotes.add("\"A bird in the hand is safer than one overhead.\"");
-        quotes.add("\"A clean desk is a sign of a sick mind.");
+        quotes.add("\"A clean desk is a sign of a sick mind.\"");
         quotes.add("\"A computer makes as many mistakes in one second as three people working for thirty years straight.\"");
         quotes.add("\"A conference is simply an admission that you want somebody else to join you in your troubles.\"");
         quotes.add("\"A dog is a dog except when he is facing you. Then he is Mr. Dog.\"");

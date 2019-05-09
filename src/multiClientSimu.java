@@ -6,12 +6,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class handle multiple threads (requests) at the same time
  */
 
-public class MultiThreadedClient {
+public class multiClientSimu {
     // TODO: is join simultaneously?
 
     public static void main(String[] args) {
@@ -62,6 +64,9 @@ public class MultiThreadedClient {
                         bigNumLst.remove(tmp);
                     }
                 }
+
+                ArrayList<Thread> threads = new ArrayList<>();
+
                 // how many bigNums, fire up how many threads
                 for (int i = 0; i < bigNumLst.size(); i ++){
                     String bigNumStr = bigNumLst.get(i);
@@ -75,28 +80,18 @@ public class MultiThreadedClient {
                     Thread newThread = new Thread(helpThread);
                     newThread.start();
 
-                    long delay = bigNumLst.size() * 2000;
+                    threads.add(newThread);
+                }
 
-                    // finish the thread then save the factor
+                // wait until all threads to finish
+                for (Thread thred : threads){
                     try {
-                        newThread.sleep(delay);  // wait for newThread to finish
+                        thred.join();  // wait for newThread to finish
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         return;
                     }
-
-                    // factor of current big number
-                    long factor = helpThread.getFac();
-                    // add it to the factor list for further display
-                    facLst.add(factor); // add all fac from each thread into the facLst
-
                 }
-
-                // display the factor in list format
-                System.out.println("Found factors: " + facLst);
-
-                // send to server
-                to.println(facLst);
 
                 // check if we got a "correct"
                 String result;
@@ -109,7 +104,7 @@ public class MultiThreadedClient {
                 // receive quote
                 System.out.println("Received " + quote + " from Server.");
                 // not make it running previous value
-                facLst.clear();
+                // facLst.clear();
 
 
             }
@@ -131,7 +126,7 @@ public class MultiThreadedClient {
         String numStr;
         private long fac = 0;
         //   ArrayList<BigInteger> facs = new ArrayList<>();
-
+        ArrayList<Long> facLst = new ArrayList<>();
 
         // constructors: initialization
         public HelperThread(Socket sock, String numStr) {
@@ -147,7 +142,6 @@ public class MultiThreadedClient {
                 this.to = new PrintWriter(sock.getOutputStream(),
                         true);
 
-                //    this.fac = new BigInteger("111");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -164,26 +158,33 @@ public class MultiThreadedClient {
         public void run() {  // no need to synchronize because we have join()
             // compute the factor
             long numLong = Long.parseLong(numStr);
-            this.fac = factor(numLong);
+//            this.fac = factor(numLong);
+
+            long factor = factor(numLong);
+
+            // display the factor in list format
+            System.out.println("Found factor: " + factor);
+
+            this.facLst.add(factor);
+
+            // send to server
+            to.println(facLst);
+
         }
     }
 
 
     public static long factor(long num) {
-        long i = 2;
+        long i;
         long sqr = (long) Math.sqrt(num);
 
-        if (num % 2 == 0){
-            return 2;
-        }
-        else {
-            i = 3;
-            while (i < sqr) {
-                if (num % i == 0) {
-                    return i;
-                } else {
-                    i = i + 2;
-                }
+
+        i = 3;
+        while (i < sqr) {
+            if (num % i == 0) {
+                return i;
+            } else {
+                i = i + 2;
             }
         }
         return i;
