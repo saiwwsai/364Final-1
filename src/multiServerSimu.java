@@ -25,7 +25,6 @@ public class multiServerSimu implements Runnable {
         }
     }
 
-
     @Override
     public void run() {
         synchronized (this){
@@ -58,7 +57,6 @@ public class multiServerSimu implements Runnable {
                         // pass bigNums to clients
                         to.println(bigNums);
                         System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
-
 
 
                       //  while(true){
@@ -96,6 +94,7 @@ public class multiServerSimu implements Runnable {
                             System.out.println(judge + " to Client " + client.getInetAddress() + ".");
                             to.println(judge);
                         }
+                        bigNums.clear();
 
                         }
 

@@ -91,8 +91,7 @@ public class multiClientSimu {
                     System.out.println("Received " + quote + " from Server.");
                 }
                 else{
-                    // todo show up the enter thing again
-                    System.out.println("DO IT A AGIN");
+                    System.out.println("DO IT A AGAIN");
                 }
                 to.flush();
             }
