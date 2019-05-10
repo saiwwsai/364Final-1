@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This class handle multiple threads (requests) at the same time
@@ -25,7 +23,7 @@ public class multiClientSimu {
         System.out.print("Enter IP address: ");
         String ip = kbd.nextLine().trim();
 
-
+        // declare two threads here to access to them later
         HelperThread helpThread = null;
         Thread newThread = null;
 
@@ -42,11 +40,13 @@ public class multiClientSimu {
                     true);
 
             // start the conversation
-            while (true) {
+            while (true) { // make sure it runs "forever"
                 System.out.println("Press <Enter> to request a quote:");
+
                 // client's response
                 String s = kbd.nextLine();
-                to.println(s); //empty
+                to.println(s); // empty line
+                // request code if the line is empty
                 if (s.isEmpty()){
                     System.out.println("Requesting quote...");
                 }
@@ -55,9 +55,11 @@ public class multiClientSimu {
                 String bigNums = from.readLine();
                 System.out.println("Finding factors of " + bigNums);
 
+                // bigNums is passed in as "[123455, 333, 53434]" a string
+                // split by the [] and , and save them into an arrayList of big numbers
                 ArrayList<String> bigNumLst = new ArrayList<>(Arrays.asList(bigNums.split(",|\\[|\\]")));
 
-
+                // go through the list and remove the empty strings : formatting
                 for (int i = 0; i < bigNumLst.size(); i ++){
                     String tmp = bigNumLst.get(i);
                     if (tmp.equals("")){
@@ -75,6 +77,7 @@ public class multiClientSimu {
                     newThread.start();
                 }
 
+                // wait until all the threads are finished
                 newThread.join();
 
 
@@ -85,6 +88,7 @@ public class multiClientSimu {
                 // receive quote
                 System.out.println("Received " + result + " from Server!");
 
+                // format console
                 if (result.equals( "\"correct\"")){
                     String quote = from.readLine();
                     // receive quote
@@ -139,19 +143,24 @@ public class multiClientSimu {
         public void run() {  // no need to synchronize because we have join()
             // compute the factor
             long numLong = Long.parseLong(numStr);
+
+            // keep track of thread number to make sure the threads not mixing up
             int threadNum = 0;
 
-
+            // formatting
             System.out.println(newThread.getName() + " is running.");
 
+            // calculate the factor
             long factor = factor(numLong);
 
 
             // display the factor in list format
             System.out.println(newThread.getName() + " found factor: " + factor);
+            // get the thread number
             threadNum = Integer.parseInt(newThread.getName().substring(6));
-            // send to server
+            // send factor to server
             to.println(factor);
+            // send thread number to server for future
             to.println(threadNum);
         }
     }
@@ -159,14 +168,17 @@ public class multiClientSimu {
 
     public static long factor(long num) {
         long i;
+        // integer/double Math.sqrt casted to long
         long sqr = (long) Math.sqrt(num);
 
-
+        // known that 2 cannot be a factor of num, because num = prime*prime
         i = 3;
+        // goes all the way up to sqr root of num, cause we are taking the smallest factor
         while (i < sqr) {
             if (num % i == 0) {
                 return i;
             } else {
+                // increase by 2, check the odds only
                 i = i + 2;
             }
         }

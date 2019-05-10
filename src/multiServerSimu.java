@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class multiServerSimu implements Runnable {
     Socket client;
-    String quote = randQuote();
+    String quote;
     ArrayList<BigInteger> bigNums = new ArrayList<>();
 
     multiServerSimu(Socket client) {
@@ -59,20 +59,22 @@ public class multiServerSimu implements Runnable {
                         System.out.println("Sending " + bigNums + " to Client " + client.getInetAddress() + ".");
 
 
-                      //  while(true){
                         boolean result = true;
 
+                        // print our the factor along with its corresponding big number
                         for (int i = 0; i < bigNums.size(); i++){
                             String fac = from.readLine();
 
+                            // get thread number from client
                             String threNum = from.readLine();
-
+                            // convert into integer
                             int threadNum = Integer.parseInt(threNum);
-
+                            //
                             if (threadNum == i){
                                 System.out.println("Verifying received factor-" + fac + " for number-" + bigNums.get(i)
                                         + " for Client " + client.getInetAddress() + ".");
                                 long factor = Long.parseLong(fac);
+                                // check if factor is a real factor
                                 if (bigNums.get(i).longValue() % factor == 0){
                                     result = true;
                                 }
@@ -82,7 +84,8 @@ public class multiServerSimu implements Runnable {
                             }
 
                         }
-
+                        // format the final output
+                        quote = randQuote();
                         String judge = "\"correct\"";
                         if (result){
                             System.out.println("Sending " + judge + " to Client " + client.getInetAddress() + ".");
@@ -97,10 +100,7 @@ public class multiServerSimu implements Runnable {
                         bigNums.clear();
 
                         }
-
                     }
-
-               // }
 
             }
             catch (IOException e){
@@ -112,6 +112,7 @@ public class multiServerSimu implements Runnable {
     }
 
     public static String randQuote(){
+        // get a random quote from all quote
         ArrayList<String> quotes = new ArrayList<String>();
         quotes.add("\"42\"");
         quotes.add("\"A bird in the hand is safer than one overhead.\"");
@@ -135,6 +136,7 @@ public class multiServerSimu implements Runnable {
     }
 
     public static BigInteger getNum(){
+        // get random big integer between 15*15 to 31*31
         Random myRandom = new Random();
         int bigRand = new Random().nextInt(17) + 15;
         BigInteger prime1 = BigInteger.probablePrime(bigRand, myRandom);
